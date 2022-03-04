@@ -26,7 +26,7 @@ namespace Echo
         public static void Read()
         {
             BinaryReader reader = new BinaryReader(clientSocket.GetStream());
-
+    
             while (true)
             {
                 string str = "response: ";
@@ -38,7 +38,7 @@ namespace Echo
 
         static void Main(string[] args)
         {
-            clientSocket = new TcpClient("localhost", 5000);
+            clientSocket = new TcpClient("localhost", 6000);
             Thread ctThreadWrite = new Thread(Write);
             Thread ctThreadRead = new Thread(Read);
             ctThreadRead.Start();

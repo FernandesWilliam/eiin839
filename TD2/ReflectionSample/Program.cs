@@ -12,18 +12,19 @@ class Program
         Type type = typeof(MyReflectionClass);
         MethodInfo method = type.GetMethod("MyMethod");
         MyReflectionClass c = new MyReflectionClass();
-        string result = (string) method.Invoke(c, null);
+        string result = (string) method.Invoke(c,new object[]{"ee","aa"});
         Console.WriteLine(result);
         Console.ReadLine();
-
+    
     }
 }
 
 public class MyReflectionClass
 {
-    public string MyMethod()
+   
+
+    public string MyMethod(string param1 , string param2)
     {
-        Console.WriteLine("Call MyMethod 1");
-        return "Call MyMethod 2";
+        return "<html><body> Hello " + param1 + " et " + param2 + "</body></html>";
     }
 }

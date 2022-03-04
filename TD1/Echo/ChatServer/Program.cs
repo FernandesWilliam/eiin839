@@ -8,8 +8,10 @@ using System.IO;
 
 namespace Echo
 {
+  
     class EchoServer
     {
+        
         [Obsolete]
         static void Main(string[] args)
         {
@@ -19,7 +21,7 @@ namespace Echo
                 System.Environment.Exit(0);
             };
 
-            TcpListener ServerSocket = new TcpListener(5000);
+            TcpListener ServerSocket = new TcpListener(6000);
             ServerSocket.Start();
 
             Console.WriteLine("Server started.");
@@ -36,6 +38,7 @@ namespace Echo
 
     public class handleClient
     {
+        string HTTP_ROOT = "../../../www/";
         TcpClient clientSocket;
         public void startClient(TcpClient inClientSocket)
         {
@@ -51,13 +54,16 @@ namespace Echo
             NetworkStream stream = clientSocket.GetStream();
             BinaryReader reader = new BinaryReader(stream);
             BinaryWriter writer = new BinaryWriter(stream);
-
+      
             while (true)
             {
-
                 string str = reader.ReadString();
                 Console.WriteLine(str);
-                writer.Write(str);
+                string[] request = str.Split(' ');
+                Console.WriteLine(HTTP_ROOT+request[1]);
+                string file = System.IO.File.ReadAllText(HTTP_ROOT+request[1]);
+                Console.WriteLine(file);
+                writer.Write(file);
             }
         }
 
