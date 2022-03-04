@@ -89,31 +89,37 @@ namespace BasicServerHTTPlistener
                 //get path in url 
                 Console.WriteLine(request.Url.LocalPath);
                 Type type = typeof(MyReflectionClass);
+                // tableau de toute les methodes contenus dans MyReflectionClass
                 var methodsName = type.GetMethods();
                 // parse path in url 
-                string responseString;
+                
                 foreach (string str in request.Url.Segments)
                 {
-                    Console.WriteLine(str);
-              
-                    if(methodsName.Any(methodn => methodn.Name == str))
+                    // test si une methode est compatible avec un segments d'url  
+                    if (methodsName.Any(a => a.Name == str))
                     {
+              
                         MethodInfo method = type.GetMethod(str);
                         MyReflectionClass c = new MyReflectionClass();
+              
+             
+                        string responseString;
                         var param1 = HttpUtility.ParseQueryString(request.Url.Query).Get("param1");
-                        var param2 = HttpUtility.ParseQueryString(request.Url.Query).Get("param2");
-                        responseString = (string) method.Invoke(c,new object[]{param1,param2});
-                        
-                        HttpListenerResponse response = context.Response;
+                        if (HttpUtility.ParseQueryString(request.Url.Query).Count > 1)
+                        {
+                            string param2 = HttpUtility.ParseQueryString(request.Url.Query).Get("param2");
+                             responseString = (string) method.Invoke(c, new object[] {param1, param2});
+                        }
+                        else
+                        {
+                            responseString = (string) method.Invoke(c, new object[] {param1});
+                        }
+                        send(context.Response,responseString);
+
                         // Construct a response.
-                        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
-                        // Get a response stream and write the response to it.
-                        response.ContentLength64 = buffer.Length;
-                        System.IO.Stream output = response.OutputStream;
-                        output.Write(buffer, 0, buffer.Length);
-                        // You must close the output stream.
-                        output.Close();
+                       
                     }
+
                 }
 
                 //get params un url. After ? and between &
@@ -128,33 +134,28 @@ namespace BasicServerHTTPlistener
             // Httplistener neither stop ... But Ctrl-C do that ...
             // listener.Stop();
         }
+
+        public static void  send(HttpListenerResponse response,string message)
+        {
+        
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(message);
+            // Get a response stream and write the response to it.
+            response.ContentLength64 = buffer.Length;
+            System.IO.Stream output = response.OutputStream;
+            output.Write(buffer, 0, buffer.Length);
+            // You must close the output stream.
+            output.Close();
+        }
     }
 }
 public class MyReflectionClass
 {
-    // public string callSh(string param1, string param2)
-    // {
-    //     ProcessStartInfo start = new ProcessStartInfo();
-    //     start.FileName = "/Users/williamfernandes/Polytech/SI4/S2/WS/eiin839/TD2/BasicWebServer/launch.sh"; // Specify exe name.
-    //    // start.Arguments = param1+ " "+ param2 ; // Specify arguments.
-    //     start.UseShellExecute = false; 
-    //     start.RedirectStandardOutput = true; 
-    //     using (Process process = Process.Start(start))
-    //     {
-    //         // Read in all the text from the process with the StreamReader.
-    //         //
-    //         using (StreamReader reader = process.StandardOutput)
-    //         {
-    //             string result = reader.ReadToEnd();
-    //             Console.WriteLine(result + "result ");
-    //             return result;
-    //             
-    //         }
-    //     }
-    // }
-    public string callExec(string param1, string param2)
+    // Il suffit de tapper une url du style "http://localhost:8080/callExecutable?param1=?&param2=?"
+    // Method pour appeller l'executable 
+    public string callExecutable(string param1, string param2)
     {
         ProcessStartInfo start = new ProcessStartInfo();
+        //Path relatif a l'ordinateur 
         start.FileName = "/Users/williamfernandes/Polytech/SI4/S2/WS/eiin839/TD2/ExecTest/bin/Debug/ExecTest.exe"; // Specify exe name.
         start.Arguments = param1+ " "+ param2 ; // Specify arguments.
         start.UseShellExecute = false; 
@@ -172,7 +173,14 @@ public class MyReflectionClass
         }
         
     }
+    
+    // Il suffit de tapper une url du style "http://localhost:8080/Incr?param1=Nombre"
+    public string Incr(string number)
+    {
 
+        return "{\"incr\":" + (int.Parse(number) + 1) + "}";
+    }
+    // Il suffit de tapper une url du style "http://localhost:8080/MyMethod?param1=?&param2=?"
     public string MyMethod(string param1 , string param2)
     {
         return "<html><body> Hello " + param1 + " et " + param2 + "</body></html>";
