@@ -155,7 +155,7 @@ public class MyReflectionClass
     public string callExecutable(string param1, string param2)
     {
         ProcessStartInfo start = new ProcessStartInfo();
-        //Path relatif a l'ordinateur 
+        //Path relatif a l'ordinateur vu que je suis sur mac... 
         start.FileName = "/Users/williamfernandes/Polytech/SI4/S2/WS/eiin839/TD2/ExecTest/bin/Debug/ExecTest.exe"; // Specify exe name.
         start.Arguments = param1+ " "+ param2 ; // Specify arguments.
         start.UseShellExecute = false; 
